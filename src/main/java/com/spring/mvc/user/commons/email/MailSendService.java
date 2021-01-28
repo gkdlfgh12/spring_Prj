@@ -46,8 +46,8 @@ public class MailSendService {
 		StringBuffer buffer = new StringBuffer();
 		int index;
 		char password;
-		//정규표현식으로 임시비밀번호 체크 할라했는데 안되넹...	
 		
+		//랜덤한 임시 비밀번호 생성	
 		char[] charPw=new char[] {
 				'0','1','2','3','4','5','6','7','8','9',
 				'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'
@@ -76,7 +76,7 @@ public class MailSendService {
 	public String sendAuthMail(String email) {
 		//6자리 크기의 난수 생성
 		String authKey = getKey(6);
-		System.out.println("이메일 화긴이요~~~"+email);
+		
 		//인증메일 전송 + 키 값 리턴
 		try{
 			MailUtils sendMail = new MailUtils(mailSender);
