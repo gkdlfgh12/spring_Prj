@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.spring.mvc.user.repository.IUserMapper">
+
+	<!-- DB컬럼명과 VO클래스의 필드명이 다르므로 ResultMap 세팅 -->
+	<resultMap id="UserMap" type="com.spring.mvc.user.model.UserVO">
+		<id property="account" column="account" />
+		<result property="password" column="password" />
+		<result property="name" column="name" />
+		<result property="regDate" column="reg_date" />
+		<result property="userEmail" column="user_email" />
+		<result property="sessionId" column="session_id" />
+		<result property="limitTime" column="limit_time" />
+		<result property="setAuthKey" column="mail_check" />
+		<result property="userGrade" column="user_grade" />
+	</resultMap>
+    
+    <!-- 회원가입 id 중복 확인 -->
+    <select id="idCheck" resultType="int">
+    	SELECT COUNT(*) FROM mvc_user WHERE account=#{account} 
+    </select>
+    
+    <!-- 회원가입 이메일 중복 확인 -->
+    <select id="emailCheck" resultType="int">
+    	SELECT COUNT(*) FROM mvc_user WHERE user_email=#{userEmail}
+    </select>
+    
+    <!-- 회원가입 sql  -->
+    <insert id="register">
+    	INSERT INTO mvc_user (account, password, name, user_email, mail_check)
+    	VALUES(#{account},#{password},#{name},#{userEmail},#{setAuthKey})
+    </insert>
+    
+    <!-- 회원정보 조회 SQL -->
+	<select id="selectOne" resultMap="UserMap">
+		SELECT * FROM mvc_user
+		WHERE account=#{account}
+    </select>
+    
+    <update id="update">
+    	UPDATE board_reply SET content=#{content} WHERE rno=#{rno}
+    </update>
+    
+    <!-- 자동 로그인을 체크한 경우 쿠키값(세션아이디)과 유지시간을 갱신 -->
+    <update id="keepLogin">  	
+		UPDATE mvc_user
+		SET session_id=#{sessionId}, limit_time=#{limitDate}
+		WHERE account=#{account}
+    </update>
+
+	<!-- 자동 로그인을 위한 유저 검색 -->
+	<select id="getUserWithSessionId" resultMap="UserMap">
+		SELECT * FROM mvc_user WHERE session_id=#{sessionId}
+	</select>
+	
+	<!-- id찾기 -->
+	<select id="findId" resultMap="UserMap">
+		SELECT ACCOUNT, NAME, USER_EMAIL FROM  mvc_user 
+		WHERE NAME=#{name} AND USER_EMAIL=#{userEmail}
+	</select>
+	
+	<!-- pw찾기 -->
+	<select id="findPw" resultMap="UserMap">
+		SELECT ACCOUNT, PASSWORD, NAME, USER_EMAIL FROM  mvc_user 
+		WHERE ACCOUNT=#{account} AND USER_EMAIL=#{userEmail}
+	</select>
+	
+	<update id="updateTmpPw">
+		UPDATE mvc_user SET PASSWORD = #{password}
+		WHERE ACCOUNT=#{account}
+	</update>
+	
+	<!-- 이메일 인증을 위한 이메일 체크값 확인 -->
+	<select id="emailChSearch" resultMap="UserMap">
+		SELECT * FROM mvc_user 
+		WHERE MAIL_CHECK=#{setAuthKey}
+	</select>
+	
+	<!-- 이메일 인증 후 이메일체크 값 YES로 변경 -->
+	<update id="emailChUpdate">
+		UPDATE mvc_user
+		SET mail_check = 'YES'
+		WHERE USER_EMAIL = #{userEmail}
+	</update>
+	
+	<!--///////////////////////////////// -->
+	<!-- mypage 변경 -->
+	<select id="myPage" resultMap="UserMap">
+		SELECT * FROM mvc_user
+		WHERE ACCOUNT=#{account}
+	</select>
+	
+	<!-- 유저 변경 - 비번도 변경시-->
+    <update id="userChInfo">
+    	UPDATE mvc_user 
+    	SET NAME=#{name}, PASSWORD=#{password}
+    	WHERE ACCOUNT = #{account}
+    </update>
+    <!-- 유저 변경 - 비번은 변경 안할경우-->
+    <update id="userChInfoNonp">
+    	UPDATE mvc_user 
+    	SET NAME=#{name}
+    	WHERE ACCOUNT = #{account}
+    </update>
+    
+    <!-- 회원탈퇴 -->
+    <delete id="memWithdrawal">
+    	DELETE FROM mvc_user
+    	WHERE ACCOUNT = #{account}
+    </delete>
+	
+</mapper>

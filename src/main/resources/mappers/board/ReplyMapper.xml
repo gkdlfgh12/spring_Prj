@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.mvc.board.repository.IReplyMapper">
+
+
+	
+
+	<!-- DB컬럼명과 VO클래스의 필드명 매핑 작업 -->
+	
+
+	<insert id="write">
+		INSERT INTO board_reply (rno, no, content, writer)
+		VALUES(board_reply_seq.NEXTVAL,#{no},#{content},#{writer})
+	</insert>
+	
+	<!-- 
+		쿼리문을 작성할 때 '<', '>', '&' 등의 기호를 사용해야 하는 경우가 생기는데,
+		xml파일에서 이를 그냥 사용할 경우 태그로 인식하는 경우가 종종 있습니다.
+		이럴 경우에 해당 기호가 태그가 아닌 실제 쿼리에 필요한 코드라고 인식시켜야 합니다.
+		이 때 사용하는 문법이 <![CDATA[ ...쿼리... ]]> 입니다.
+		CDATA 안에 쿼리를 작성하면 쿼리 내용의 괄호나 특수문자를 xml문법으로 인식하지 않고
+		문자열로 인식합니다.
+	 -->
+	
+	<!-- <select id="getReplyList" resultMap="com.spring.mvc.board.model.ReplyVO">
+		<![CDATA[
+		SELECT * FROM
+			(SELECT ROWNUM as rn, re.* FROM
+				(SELECT * FROM board_reply
+				WHERE no=${no}
+				ORDER BY no DESC
+				) re
+			)
+		WHERE rn > (#{paging.page}-1) * 10 
+		AND rn <= #{paging.page} * 10
+		]]>
+	</select> -->
+	
+	<!-- 게시글에 맞는 댓글 출력 -->
+	<select id="getReplyList" resultType="com.spring.mvc.board.model.ReplyVO">
+		<![CDATA[
+		SELECT * FROM
+			(SELECT ROWNUM as rn, re.* FROM
+				(SELECT * FROM board_reply
+				WHERE no=${no}
+				ORDER BY no DESC
+				) re
+			)
+		WHERE rn > (#{repage.page}-1) * 10 
+		AND rn <= #{repage.page} * 10
+		ORDER BY rno desc
+		]]>
+	</select>
+	
+	<!-- 페이징을 위한 게시글에 맞는 댓글 갯수를 뽑아옴 -->
+	<select id="getCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM BOARD_REPLY WHERE no=#{no}
+	</select>
+	
+	<update id="update">
+		UPDATE board_reply
+		SET content=#{content}
+		WHERE rno=#{rno}
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM board_reply
+		WHERE rno=#{rno}
+	</delete>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

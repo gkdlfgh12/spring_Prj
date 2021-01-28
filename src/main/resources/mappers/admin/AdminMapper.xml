@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.spring.mvc.admin.repository.IAdminMapper">
+
+	<sql id="search1" >
+		
+		<if test="condition == 'id'">
+			WHERE account LIKE '%'|| #{keyword}||'%'
+		</if>
+		<if test="condition == 'name'">
+			WHERE name LIKE '%'|| #{keyword}||'%'
+		</if>
+		<if test="condition == 'email'">
+			WHERE user_email LIKE '%'|| #{keyword}||'%'
+		</if>
+		<if test="condition == 'grade'">
+			WHERE user_grade LIKE '%'|| #{keyword}||'%'
+		</if>
+	</sql>
+	
+
+	<resultMap id="UserMap" type="com.spring.mvc.admin.model.UserVO">
+		<id property="account" column="account" />
+		<result property="password" column="password" />
+		<result property="name" column="name" />
+		<result property="regDate" column="reg_date" />
+		<result property="userEmail" column="user_email" />
+		<result property="sessionId" column="session_id" />
+		<result property="limitTime" column="limit_time" />
+		<result property="setAuthKey" column="mail_check" />
+		<result property="userGrade" column="user_grade" />
+	</resultMap>
+
+    <!-- <select id="userManage" resultMap="UserMap">
+    	<![CDATA[
+		SELECT * FROM
+			(SELECT ROWNUM as rn, usr.* FROM
+				(SELECT * FROM mvc_user
+				 ]]>
+				<include refid="search1" />
+				<![CDATA[
+				ORDER BY reg_date asc
+				) usr
+			)
+		WHERE rn > (#{userPaging.page}-1) * #{userPaging.countPerPage} 
+		AND rn <= #{userPaging.page} * #{userPaging.countPerPage}
+		]]>
+    </select>
+    
+    <select id="countUser" resultType="int">
+		SELECT COUNT(*)
+		FROM mvc_user
+		<include refid="search1" />
+	</select> -->
+    
+    <!-- 유저 관리를 위한 유저 목록 뽑기 -->
+    <select id="userManage" resultMap="UserMap">
+    	<![CDATA[
+		SELECT * FROM
+			(SELECT ROWNUM as rn, usr.* FROM
+				(SELECT * FROM mvc_user
+				 ]]>
+				<include refid="search1" />
+				<![CDATA[
+				ORDER BY reg_date asc
+				) usr
+			)
+		WHERE rn > (#{page}-1) * #{countPerPage} 
+		AND rn <= #{page} * #{countPerPage}
+		]]>
+    </select>
+    
+    <!-- 유저의 수 -->
+    <select id="countUser" resultType="int">
+		SELECT COUNT(*)
+		FROM mvc_user
+		<include refid="search1" />
+	</select>
+    
+    <!-- 유저 자세히 -->
+    <select id="userContent" resultMap="UserMap">
+    	SELECT * FROM mvc_user WHERE ACCOUNT=#{account}
+    </select>
+    
+    <!-- 유저 변경 -->
+    <update id="userChange">
+    	UPDATE mvc_user 
+    	SET NAME=#{name}, PASSWORD=#{password}, USER_EMAIL=#{userEmail}, MAIL_CHECK=#{setAuthKey}, USER_GRADE=#{userGrade}
+    	WHERE ACCOUNT = #{account}
+    </update>
+    
+    <!-- 유저 변경 - 비밀번호 미포함 -->
+    <update id="userChangeNonp">
+    	UPDATE mvc_user 
+    	SET NAME=#{name}, USER_EMAIL=#{userEmail}, MAIL_CHECK=#{setAuthKey}, USER_GRADE=#{userGrade}
+    	WHERE ACCOUNT = #{account}
+    </update>
+    
+</mapper>
