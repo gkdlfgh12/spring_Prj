@@ -20,8 +20,8 @@
 	<resources mapping="/scss/**" location="/resources/scss/" />
 	<resources mapping="/vendor/**" location="/resources/vendor/" />
 	
-	
-	
+	<!-- email properties 파일 -->
+	<context:property-placeholder location="/WEB-INF/email/email.properties" />
 
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
 	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -51,8 +51,8 @@
 	<beans:bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
 		<beans:property name="host" value="smtp.gmail.com"/>
 		<beans:property name="port" value="587"/>
-		<beans:property name="username" value="hihspring12@gmail.com"/>
-		<beans:property name="password" value="zldtmvmfld@"/>
+		<beans:property name="username" value="${email.account}"/>
+		<beans:property name="password" value="${email.password}"/>
 		<beans:property name="defaultEncoding" value="utf-8"/>
 		<beans:property name="javaMailProperties">
 			<beans:props>
