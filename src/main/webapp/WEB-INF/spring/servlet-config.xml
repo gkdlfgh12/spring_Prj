@@ -21,7 +21,8 @@
 	<resources mapping="/vendor/**" location="/resources/vendor/" />
 	
 	<!-- email properties 파일 -->
-	<context:property-placeholder location="/WEB-INF/email/email.properties" />
+	<!--<context:property-placeholder location="/WEB-INF/email/email.properties" /> -->
+	<context:property-placeholder location="file:C:\\email\\email.properties" />
 
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
 	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
